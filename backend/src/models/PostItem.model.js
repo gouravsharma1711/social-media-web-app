@@ -25,6 +25,7 @@ const postItemSchema = new mongoose.Schema({
     timestamps: true,
 })
 
+postItemSchema.index({postId:1});
 
 const PostItem = mongoose.model("PostItem", postItemSchema);
 module.exports = PostItem;

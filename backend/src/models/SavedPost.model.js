@@ -15,5 +15,7 @@ const savedPost = new mongoose.Schema({
     timestamps:true
 });
 
+savedPost.index({userId:1, postId:1},{unique:1})
+
 const SavedPost= mongoose.model('SavedPost',savedPost);
 module.exports= SavedPost;

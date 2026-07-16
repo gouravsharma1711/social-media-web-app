@@ -12,7 +12,7 @@ const likeSchema = new mongoose.Schema({
         required: [true, "Type is required"]
     },
     typeId:{
-        type:String,
+        type:mongoose.Schema.Types.ObjectId,
         required: [true, "Type ID is required"]
     },
 
@@ -20,6 +20,7 @@ const likeSchema = new mongoose.Schema({
     timestamps: true
 })
 
+likeSchema.index({likedBy:1,type:1,typeId:1},{unique:true});
 
 const Like = mongoose.model("Like", likeSchema);
 module.exports = Like;

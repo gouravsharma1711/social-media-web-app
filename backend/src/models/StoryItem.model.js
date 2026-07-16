@@ -38,5 +38,9 @@ const storyItemSchema = new mongoose.Schema({
     timestamps:true,
 })
 
+storyItemSchema.index({
+    expiresAt:1
+})
+
 const StoryItem = mongoose.model('StoryItem',storyItemSchema);
 module.exports = StoryItem;

@@ -4,7 +4,8 @@ const conversationSchema= new mongoose.Schema({
     lastMsg:{
         type:mongoose.Schema.Types.ObjectId,
         ref:'Msg',
-        required:['true',"last Msg is Required"]
+        required:['true',"last Msg is Required"],
+        default:null
     },
     participants:[{
         type:mongoose.Schema.Types.ObjectId,
@@ -29,5 +30,8 @@ const conversationSchema= new mongoose.Schema({
     timestamps:true
 })
 
-const Conversation = mongoose.model('StoryView',conversationSchema);
+conversationSchema.index({participants:1});
+conversationSchema.index({lastMsg:1});
+
+const Conversation = mongoose.model('Conversation',conversationSchema);
 module.exports= Conversation;

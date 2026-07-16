@@ -1,4 +1,4 @@
-const mongooose = require('mongoose');
+const mongoose = require("mongoose");
 
 const storyViewSchema= new mongoose.Schema({
     viewedBy:{
@@ -16,7 +16,12 @@ const storyViewSchema= new mongoose.Schema({
         ref:'StoryItem',
         required:[true,"itemId is required"]
     }
+},{
+    timestamps:true
 })
+
+
+storyViewSchema.index({itemId:1,viewedBy:1},{unique:1});
 
 const StoryView = mongoose.model('StoryView',storyViewSchema);
 module.exports = StoryView;

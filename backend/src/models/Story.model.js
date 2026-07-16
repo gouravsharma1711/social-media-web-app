@@ -17,5 +17,7 @@ const storySchema = new mongoose.Schema({
     timestamps:true
 })
 
+storySchema.index({createdBy:1});
+
 const Story = mongoose.model("Story", storySchema);
 module.exports = Story;

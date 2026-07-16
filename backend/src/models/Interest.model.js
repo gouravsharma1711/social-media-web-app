@@ -14,7 +14,8 @@ const interestSchema = new mongoose.Schema({
     }
 });
 
-interestSchema.index({slug:1});
+interestSchema.index({ slug: 1 }, { unique: true });
+interestSchema.index({ name: 1 }, { unique: true });
 
 const Interest = mongoose.model('Interest',interestSchema);
 module.exports = Interest;

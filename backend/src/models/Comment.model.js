@@ -14,6 +14,7 @@ const commentSchema = new mongoose.Schema({
     parentCommentId:{
         type:mongoose.Schema.Types.ObjectId,
         ref:'Comment',
+        default:null
     },
     likesCount:{
         type:Number,
@@ -29,5 +30,11 @@ const commentSchema = new mongoose.Schema({
     timestamps:true
 })
 
+
+commentSchema.index({postId:1});
+commentSchema.index({parentCommentId:1});
+commentSchema.index({commentedBy:1});
+commentSchema.index({postId:1,createdAt:-1});
+
 const Comment = mongoose.model('Comment',commentSchema);
-module.exports= commentSchema;
+module.exports= Comment;

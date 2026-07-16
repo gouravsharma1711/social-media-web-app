@@ -25,8 +25,12 @@ const msgSchema = new mongoose.Schema({
         ref: 'Conversation',
         required: [true, "Conversation ID is required"]
     }
+},{
+    timestamps:true
 })
 
+msgSchema.index({sender:1});
+msgSchema.index({conversationId:1,createdAt:1});
 
 const Msg = mongoose.model("Msg", msgSchema);
 module.exports = Msg;

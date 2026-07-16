@@ -9,10 +9,10 @@ const NotificationSchema = new mongoose.Schema({
     entityType:{
         type:String,
         required:[true, "Entity type is required"],
-        enum:["post","comment","story","mention","user"]
+        enum:["post","comment","story","user"]
     },
     entityId:{
-        type:String,
+        type:mongoose.Schema.Types.ObjectId,
         required:[true, "Entity ID is required"]
     },
     isRead:{
@@ -61,6 +61,10 @@ NotificationSchema.pre('save', function(next){
     }
     next();
 });
+
+NotificationSchema.index({sender:1});
+NotificationSchema.index({receiver:1,createdAt:-1});
+NotificationSchema.index({receiver:1,isRead:1});
 
 const Notification = mongoose.model('Notification', NotificationSchema);
 

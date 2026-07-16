@@ -15,5 +15,7 @@ const closedFriendSchema = new mongoose.Schema({
     timestamps: true,
 })
 
+closedFriendSchema.index({owner:1,friend:1},{unique:1});
+
 const ClosedFriend = mongoose.model("ClosedFriend", closedFriendSchema);
 module.exports = ClosedFriend;

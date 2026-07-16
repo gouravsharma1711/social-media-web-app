@@ -20,5 +20,10 @@ const postTagSchema= new mongoose.Schema({
     timestamps:true
 })
 
+
+postTagSchema.index({taggedBy:1});
+postTagSchema.index({post:1,taggedUser:1},{unique:1});
+
+
 const PostTag = mongoose.model('PostTag',postTagSchema);
 module.exports= PostTag;

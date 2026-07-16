@@ -7,10 +7,10 @@ const MentionSchema = new mongoose.Schema({
         required: [true, "Entity type is required"]
     },
     entityId:{
-        type:String,
+        type:mongoose.Schema.Types.ObjectId,
         required: [true, "Entity ID is required"]
     },
-    mentionedUsed:{
+    mentionedUser:{
         type:mongoose.Schema.Types.ObjectId,
         ref:"User",
         required: [true, "Mentioned user is required"]
@@ -24,6 +24,8 @@ const MentionSchema = new mongoose.Schema({
     timestamps: true,
 });
 
+MentionSchema.index({mentionedUser:1,entityType:1,entityId:1});
+MentionSchema.index({mentionedBy:1});
 
 const Mention = mongoose.model('Mention', MentionSchema);
 module.exports = Mention;

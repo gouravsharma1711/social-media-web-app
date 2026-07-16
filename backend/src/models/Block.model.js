@@ -13,5 +13,7 @@ const blockSchema = new mongoose.Schema({
     }
 });
 
+blockSchema.index({blockBy:1,blockedUser:1},{unique:1});
+
 const Block = mongoose.model('Block', blockSchema);
 module.exports = Block;

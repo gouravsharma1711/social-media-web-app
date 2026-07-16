@@ -28,12 +28,16 @@ const postSchema = new mongoose.Schema({
     },
     createdBy:{
         type: mongoose.Schema.Types.ObjectId,
-        ref: "User"
+        ref: "User",
+        required:[true,"CreatedBy is required"]
     }
 }, {
     timestamps: true,
 });
 
+
+postSchema.index({createdBy:1});
+postSchema.index({createdBy:1,createdAt:-1});
 
 const Post = mongoose.model('Post', postSchema);
 module.exports = Post;
