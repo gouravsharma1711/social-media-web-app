@@ -118,9 +118,7 @@ const userSchema = new mongoose.Schema({
     timestamps: true
 });
 
-userSchema.index({ userName: 1 });
-userSchema.index({ email: 1 });
-userSchema.index({ phoneNo: 1 });
+
 
 
 userSchema.pre('save',async function(next){
@@ -136,7 +134,7 @@ userSchema.methods.comparePassword= async function(currPassword){
     return await bcrypt.compare(currPassword,this.password);
 }
 
-userSchema.methods.generateAccessToken = async function(){
+userSchema.methods.generateAccessToken = function(){
     return jwt.sign(
         {
             _id:this._id,
@@ -148,7 +146,7 @@ userSchema.methods.generateAccessToken = async function(){
     )
 }
 
-userSchema.methods.generateRefreshToken = async function(){
+userSchema.methods.generateRefreshToken = function(){
     return jwt.sign(
         {
             _id:this._id,
