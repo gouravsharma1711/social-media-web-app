@@ -1,16 +1,24 @@
-const asyncHandler = (requestHandler)=>{
-    return (req, res, next)=>{
+const asyncHandler = (requestHandler) => {
+    return (req, res, next) => {
         Promise
-        .resolve(requestHandler(req,res,next))
-        .catch((error)=>{
-            console.log("error : ",error);
-            
+            .resolve(requestHandler(req, res, next))
+            .catch((error) => {
 
-            res.status(error.statusCode || 500 ).json({
-                ...error,
-                message:error.message || "Internal Server Error"
-            });
-        })
+                const response = Object.keys(error).length === 0? 
+                {
+                    statusCode:error.statusCode ||  500,
+                    error: {},
+                    success: false,
+                    data: null,
+                    message:error.message || "Internal Server Error",
+                }
+                : {
+                    ...error,
+                    message:error.message
+                };
+
+                res.status(response.statusCode || 500).json(response);
+            })
     }
 }
 

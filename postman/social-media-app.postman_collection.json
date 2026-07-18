@@ -1,0 +1,115 @@
+{
+  "info": {
+    "_postman_id": "16f46226-abf0-4834-9dd7-3d2d60cd38ab",
+    "name": "social-media-app",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "56157513",
+    "_collection_link": "https://go.postman.co/collection/56157513-16f46226-abf0-4834-9dd7-3d2d60cd38ab?source=collection_link"
+  },
+  "item": [
+    {
+      "name": "User",
+      "item": [
+        {
+          "name": "signUp",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"userName\":\"gourav_1711\",\r\n    \"fullName\":\"Gourav Sharma\",\r\n    \"email\":\"gourav@gmail.com\",\r\n    \"password\":\"Gourav@123#\",\r\n    \"phoneNo\":\"8595725620\",\r\n    \"countryCode\":\"+91\",\r\n    \"country\":\"India\",\r\n    \"gender\":\"male\",\r\n    \"dob\":\"2002-11-17\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{userBaseUrl}}/signup",
+              "host": [
+                "{{userBaseUrl}}"
+              ],
+              "path": [
+                "signup"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "logIn",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"userName\":\"\",\r\n    \"phoneNo\":\"\",\r\n    \"email\":\"gourav@gmail.com\",\r\n    \"password\":\"Gourav@123#\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{userBaseUrl}}/login",
+              "host": [
+                "{{userBaseUrl}}"
+              ],
+              "path": [
+                "login"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "logout",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"userName\":\"gourav_1711\",\r\n    \"phoneNo\":\"\",\r\n    \"email\":\"gourav@gmail.com\",\r\n    \"password\":\"Gourav@123#\"\r\n}"
+            },
+            "url": {
+              "raw": "{{userBaseUrl}}/logout",
+              "host": [
+                "{{userBaseUrl}}"
+              ],
+              "path": [
+                "logout"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "change-password",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"oldPassword\":\"Gouravsharma@123#\",\r\n    \"newPassword\":\"Gourav@123#\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{userBaseUrl}}/change-password",
+              "host": [
+                "{{userBaseUrl}}"
+              ],
+              "path": [
+                "change-password"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    }
+  ]
+}

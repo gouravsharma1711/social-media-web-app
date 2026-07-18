@@ -54,7 +54,7 @@ const Auth = asyncHandler(async(req, res, next) => {
     
     if(!accessToken && !refreshToken){
 
-        throw new ApiError(401,"Access token or refresh token is required.");
+        throw new ApiError(401,"User is not Logged In");
 
     }else if (accessToken) {
         const  decoded =  verifyToken(accessToken,process.env.JWT_ACCESS_TOKEN_SECRET,"access Token");
