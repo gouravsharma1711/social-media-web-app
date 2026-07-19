@@ -2,6 +2,22 @@ const mongoose = require('mongoose');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 
+
+const imageSchema = new mongoose.Schema({
+    url: { 
+        type: String,
+        default: "" 
+    },
+    thumbnailUrl: {
+        type: String, 
+        default: "" 
+    },
+    fileId:{
+        type:String,
+        default:""
+    }
+}, { _id: false });
+
 const userSchema = new mongoose.Schema({
     userName: {
         type: String,
@@ -57,8 +73,8 @@ const userSchema = new mongoose.Schema({
         required: [true, "Gender is required"]
     },
     profileImage: {
-        type: String,
-        default: ''
+        type:imageSchema,
+        default: () => ({ url: "", thumbnailUrl: "" })
     },
     bio: {
         type: String,

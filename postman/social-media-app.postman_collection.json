@@ -16,13 +16,72 @@
             "method": "POST",
             "header": [],
             "body": {
-              "mode": "raw",
-              "raw": "{\r\n    \"userName\":\"gourav_1711\",\r\n    \"fullName\":\"Gourav Sharma\",\r\n    \"email\":\"gourav@gmail.com\",\r\n    \"password\":\"Gourav@123#\",\r\n    \"phoneNo\":\"8595725620\",\r\n    \"countryCode\":\"+91\",\r\n    \"country\":\"India\",\r\n    \"gender\":\"male\",\r\n    \"dob\":\"2002-11-17\"\r\n}",
-              "options": {
-                "raw": {
-                  "language": "json"
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "userName",
+                  "value": "",
+                  "description": "Unique username chosen by the user for login and identification (Required with min length 3 and maxLength 30)",
+                  "type": "text",
+                  "uuid": "841fcd4a-0122-46fc-b8ef-bf476fdc8d76"
+                },
+                {
+                  "key": "fullName",
+                  "value": "",
+                  "description": "Full name of the user as it appears on their profile. (Required with maxLength 100)",
+                  "type": "text",
+                  "uuid": "088728bb-ec64-4635-8732-17e478aa6b45"
+                },
+                {
+                  "key": "email",
+                  "value": "",
+                  "description": "Valid email address used for account registration and communication.(Required , unique and lowercase)",
+                  "type": "text",
+                  "uuid": "cf7439cb-6f09-4928-acc2-46974ffc06ae"
+                },
+                {
+                  "key": "password",
+                  "value": "",
+                  "description": "User's account password. Must meet the application's password policy (required with min length of 8 and max length 100 ).",
+                  "type": "text",
+                  "uuid": "44752fed-e7ee-4708-8274-29e00647945d"
+                },
+                {
+                  "key": "phoneNo",
+                  "value": "",
+                  "description": "User's mobile phone number without the country code(required with min length 6 and max 15)",
+                  "type": "text",
+                  "uuid": "19fbcb08-7d4b-44cb-b675-4462b7ae80ec"
+                },
+                {
+                  "key": "countryCode",
+                  "value": "",
+                  "description": "International dialing code associated with the user's phone number and it's required field (e.g., +91 for India).",
+                  "type": "text",
+                  "uuid": "5fa3f5de-b2ab-4205-826a-dd0e8f194b48"
+                },
+                {
+                  "key": "country",
+                  "value": "",
+                  "description": "Country where the user resides or is registered(Required field)",
+                  "type": "text",
+                  "uuid": "4453b0e4-87dd-4940-91b7-38d6a1681479"
+                },
+                {
+                  "key": "gender",
+                  "value": "",
+                  "description": "User's gender(required and value can be either male, female or other)",
+                  "type": "text",
+                  "uuid": "01491f86-e3e1-4ae6-b512-41998c492623"
+                },
+                {
+                  "key": "dob",
+                  "value": "",
+                  "description": "User's date of birth in YYYY-MM-DD format.",
+                  "type": "text",
+                  "uuid": "ceb52ccb-375a-4c75-a22c-f66d71483bf0"
                 }
-              }
+              ]
             },
             "url": {
               "raw": "{{userBaseUrl}}/signup",
@@ -42,13 +101,33 @@
             "method": "POST",
             "header": [],
             "body": {
-              "mode": "raw",
-              "raw": "{\r\n    \"userName\":\"\",\r\n    \"phoneNo\":\"\",\r\n    \"email\":\"gourav@gmail.com\",\r\n    \"password\":\"Gourav@123#\"\r\n}",
-              "options": {
-                "raw": {
-                  "language": "json"
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "userName",
+                  "value": "",
+                  "type": "text",
+                  "description": "Username, email address, or mobile phone number used to log in."
+                },
+                {
+                  "key": "phoneNo",
+                  "value": "",
+                  "type": "text",
+                  "description": "User's registered mobile phone number (optional if logging in with username or email)."
+                },
+                {
+                  "key": "email",
+                  "value": "",
+                  "type": "text",
+                  "description": "User's registered email address (optional if logging in with username or phone number)."
+                },
+                {
+                  "key": "password",
+                  "value": "",
+                  "type": "text",
+                  "description": "User's account password for authentication."
                 }
-              }
+              ]
             },
             "url": {
               "raw": "{{userBaseUrl}}/login",
@@ -68,8 +147,8 @@
             "method": "POST",
             "header": [],
             "body": {
-              "mode": "raw",
-              "raw": "{\r\n    \"userName\":\"gourav_1711\",\r\n    \"phoneNo\":\"\",\r\n    \"email\":\"gourav@gmail.com\",\r\n    \"password\":\"Gourav@123#\"\r\n}"
+              "mode": "formdata",
+              "formdata": []
             },
             "url": {
               "raw": "{{userBaseUrl}}/logout",
@@ -89,13 +168,21 @@
             "method": "POST",
             "header": [],
             "body": {
-              "mode": "raw",
-              "raw": "{\r\n    \"oldPassword\":\"Gouravsharma@123#\",\r\n    \"newPassword\":\"Gourav@123#\"\r\n}",
-              "options": {
-                "raw": {
-                  "language": "json"
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "oldPassword",
+                  "value": "",
+                  "type": "text",
+                  "description": "User's current account password used to verify identity before changing the password."
+                },
+                {
+                  "key": "newPassword",
+                  "value": "",
+                  "type": "text",
+                  "description": "New password to replace the current password. Must comply with the application's password policy and the new Password should be same as old one"
                 }
-              }
+              ]
             },
             "url": {
               "raw": "{{userBaseUrl}}/change-password",
@@ -104,6 +191,78 @@
               ],
               "path": [
                 "change-password"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "update-phone-number",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "newPhoneNo",
+                  "value": "",
+                  "description": "New Phone Number which user want to update and the length between 6 to 15",
+                  "type": "text",
+                  "uuid": "427bf46e-2dc8-481c-b0f6-0bddc3fa6e75"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{userBaseUrl}}/update-phone-number",
+              "host": [
+                "{{userBaseUrl}}"
+              ],
+              "path": [
+                "update-phone-number"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "get-current-user",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{userBaseUrl}}",
+              "host": [
+                "{{userBaseUrl}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "update-profile",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "profilePic",
+                  "description": "Select the Image that you want to set as profile Image",
+                  "type": "file",
+                  "uuid": "45f8316d-2865-4914-95af-8bccaac4df55",
+                  "value": null
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{userBaseUrl}}/update-profile",
+              "host": [
+                "{{userBaseUrl}}"
+              ],
+              "path": [
+                "update-profile"
               ]
             }
           },

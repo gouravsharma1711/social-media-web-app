@@ -2,7 +2,8 @@ const { User } = require("../models");
 const ApiError = require("../utils/ApiError");
 const asyncHandler = require("../utils/asyncHandler");
 const ApiResponse = require('../utils/ApiResponse');
-
+const { removeTheFileFromImageKit, uploadSingleFileToImageKit } = require("../utils/imageKit");
+const fs = require('fs')
 
 const cookieOptions = {
     httpOnly: true,
@@ -21,7 +22,7 @@ const accessTokenExpiry = {
 
 // controllers 
 
-/// userSignUp => help user to sign up on the platform(post)
+// userSignUp => help user to sign up on the platform(post)
 
 const userSignUp = asyncHandler(async (req, res) => {
 
@@ -174,7 +175,7 @@ const userLogIn = asyncHandler(async (req, res) => {
 
 })
 
-// // userLogOut => help user to loged out from the platform(post)
+// userLogOut => help user to loged out from the platform(post)
 
 const userLogOut = asyncHandler(async (req, res) => {
     // fetch the user information using req.user
@@ -235,15 +236,16 @@ const updateUserPassword = asyncHandler(async (req, res) => {
 
     let response = res.status(200);
 
-    if (res.locals.refreshToken && res.locals.accessToken) {
-        response = response
-            .cookie("refreshToken", res.locals.refreshToken, {
+    const { refreshToken, accessToken } = res.locals;
+    if (refreshToken && accessToken) {
+        response
+            .cookie("refreshToken", refreshToken, {
                 ...cookieOptions,
-                ...refreshTokenExpiry
+                ...refreshTokenExpiry,
             })
-            .cookie("accessToken", res.locals.accessToken, {
+            .cookie("accessToken", accessToken, {
                 ...cookieOptions,
-                ...accessTokenExpiry
+                ...accessTokenExpiry,
             });
     }
 
@@ -256,6 +258,167 @@ const updateUserPassword = asyncHandler(async (req, res) => {
 
 })
 
+const updateUserPhoneNumber = asyncHandler(async (req, res) => {
+    // Extract the user data and New Phone Number from req
+    const { user } = req;
+    let { newPhoneNo } = req.body;
+
+    // Validation check
+    newPhoneNo = newPhoneNo?.trim();
+    if (!newPhoneNo) {
+        throw new ApiError(400, "New Phone Number is required");
+    }
+
+    if (!/^\d{6,15}$/.test(newPhoneNo)) {
+        throw new ApiError(400, "Phone number must contain only digits and be between 6 and 15 digits long.");
+    }
+
+    if (user.phoneNo === newPhoneNo) {
+        throw new ApiError(400, "New phone number cannot be the same as the current phone number.");
+    }
+
+    // check whether any user exist with new Phone Number
+    const userExist = await User.findOne({
+        phoneNo: newPhoneNo
+    });
+
+    if (userExist) {
+        throw new ApiError(409, "Phone Number is already registered")
+    }
+
+    // update the Phone Number
+    user.phoneNo = newPhoneNo;
+    await user.save()
+
+    // send the response
+
+    let response = res.status(200);
+
+    const { refreshToken, accessToken } = res.locals;
+    if (refreshToken && accessToken) {
+        response
+            .cookie("refreshToken", refreshToken, {
+                ...cookieOptions,
+                ...refreshTokenExpiry,
+            })
+            .cookie("accessToken", accessToken, {
+                ...cookieOptions,
+                ...accessTokenExpiry,
+            });
+    }
+
+    return response.json(
+        new ApiResponse(
+            200,
+            "Phone Number updated successfully."
+        )
+    );
+
+})
+
+
+const getCurrentUser = asyncHandler(async (req, res) => {
+    let userData = req.user.toObject();
+    delete userData.refreshToken;
+
+    let response = res.status(200);
+
+    const { refreshToken, accessToken } = res.locals;
+    if (refreshToken && accessToken) {
+        response
+            .cookie("refreshToken", refreshToken, {
+                ...cookieOptions,
+                ...refreshTokenExpiry,
+            })
+            .cookie("accessToken", accessToken, {
+                ...cookieOptions,
+                ...accessTokenExpiry,
+            });
+    }
+
+    return response.json(
+        new ApiResponse(
+            200,
+            "Current User's Data Fetched successfully.",
+            userData
+        )
+    );
+
+})
+
+
+const updateUserProfilePic = asyncHandler(async (req, res) => {
+    const profilePicData = req.file;
+    const user = req.user;
+
+    if (!profilePicData) {
+        throw new ApiError(400, "Profile Picture data is Not Fetched Successfully Retry");
+    }
+
+    if (!profilePicData?.mimetype?.startsWith("image/")) {
+        throw new ApiError(400, "Profile Picture should be of Type Image")
+    }
+
+
+
+    const imageKitResponse = await uploadSingleFileToImageKit(profilePicData, 'users/profile-pictures');
+
+    if (!imageKitResponse) {
+        throw new ApiError(500, "File Uplord Unsuccessful(ImageKit)")
+    }
+
+    if (user?.profileImage?.url !== "") {
+        await removeTheFileFromImageKit(user.profileImage.fileId);
+    }
+
+    user.profileImage = {
+        fileId: imageKitResponse?.fileId,
+        url: imageKitResponse?.url,
+        thumbnailUrl: imageKitResponse?.thumbnailUrl
+    }
+
+    try {
+        await user.save();
+    } catch (error) {
+        await removeTheFileFromImageKit(imageKitResponse.fileId).catch(() => { });
+
+        throw new ApiError(
+            error.statusCode || 500,
+            "Profile Picture updation failed.",
+            error.stack
+        );
+    }
+
+    const userData = user.toObject();
+    delete userData.password;
+    delete userData.refreshToken;
+
+
+    let response = res.status(200);
+
+    const { refreshToken, accessToken } = res.locals;
+    if (refreshToken && accessToken) {
+        response
+            .cookie("refreshToken", refreshToken, {
+                ...cookieOptions,
+                ...refreshTokenExpiry,
+            })
+            .cookie("accessToken", accessToken, {
+                ...cookieOptions,
+                ...accessTokenExpiry,
+            });
+    }
+
+    return response.json(
+        new ApiResponse(
+            200,
+            "Profile Picture Updated successfully.",
+            userData
+        )
+    );
+});
+
+
 
 
 module.exports = {
@@ -263,4 +426,7 @@ module.exports = {
     userLogIn,
     userLogOut,
     updateUserPassword,
+    updateUserPhoneNumber,
+    getCurrentUser,
+    updateUserProfilePic
 };
