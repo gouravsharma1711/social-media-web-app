@@ -14,7 +14,10 @@ const asyncHandler = (requestHandler) => {
                 }
                 : {
                     ...error,
-                    message:error.message
+                    message:error.message,
+                    success:false,
+                    ErrorStack:error.stack,
+                    statusCode:error.statusCode || 500
                 };
 
                 res.status(response.statusCode || 500).json(response);

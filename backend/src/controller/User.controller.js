@@ -1,9 +1,11 @@
-const { User } = require("../models");
+const { User, Otp } = require("../models");
 const ApiError = require("../utils/ApiError");
 const asyncHandler = require("../utils/asyncHandler");
 const ApiResponse = require('../utils/ApiResponse');
 const { removeTheFileFromImageKit, uploadSingleFileToImageKit } = require("../utils/imageKit");
-const fs = require('fs')
+const fs = require('fs');
+const sendMail = require("../utils/mailService");
+
 
 const cookieOptions = {
     httpOnly: true,
@@ -18,6 +20,23 @@ const refreshTokenExpiry = {
 const accessTokenExpiry = {
     maxAge: 24 * 60 * 60 * 1000 // 1 Day => 24hr * 60 min * 60 sec * 1000 ms
 }
+
+
+const validateOtp = async (email, otp) => {
+    const otpData = await Otp.findOne({ email });
+
+    if (!otpData) {
+        throw new ApiError(400, "OTP is expired.");
+    }
+
+    const isValidOtp = await otpData.compareOtp(otp);
+
+    if (!isValidOtp) {
+        throw new ApiError(400, "Invalid OTP.");
+    }
+
+    return otpData;
+};
 
 
 // controllers 
@@ -418,8 +437,197 @@ const updateUserProfilePic = asyncHandler(async (req, res) => {
     );
 });
 
+const requestForOtp = asyncHandler(async (req, res) => {
+    let { purpose, email } = req.body;
+    const user = req.user;
+
+    otpFor = otpFor?.trim();
+
+    const validOtpFor = [
+        "verification", "emailUpdation"
+    ]
+
+    if (!otpFor) {
+        throw new ApiError(400, "Otp For is required field")
+    }
+
+    if (!validOtpFor.includes(otpFor)) {
+        throw new ApiError(400, "Invalid OTP purpose")
+    }
 
 
+    const oneMinuteAgo = new Date(Date.now() - 60 * 1000);
+
+    const recentOtp = await Otp.findOne({
+        email: email || user.email,
+        purpose,
+        createdAt: { $gte: oneMinuteAgo }
+    });
+
+    if (recentOtp) {
+        throw new ApiError(
+            429,
+            "Please wait 1 minute before requesting another OTP."
+        );
+    }
+
+
+    let otp = "";
+
+    for (let i = 0; i < 6; i++) {
+        let num = Math.floor(Math.random() * 10);
+        otp += num;
+    }
+
+    await Otp.create({
+        email: email || user.email,
+        otp,
+        expiresAt: Date.now() + (60 * 1000),
+        otpFor,
+    })
+
+    await sendMail(email || user.email, otp, otpFor);
+
+    let response = res.status(200);
+
+    const { refreshToken, accessToken } = res.locals;
+    if (refreshToken && accessToken) {
+        response
+            .cookie("refreshToken", refreshToken, {
+                ...cookieOptions,
+                ...refreshTokenExpiry,
+            })
+            .cookie("accessToken", accessToken, {
+                ...cookieOptions,
+                ...accessTokenExpiry,
+            });
+    }
+
+    return response.json(
+        new ApiResponse(
+            200,
+            "OTP send successfully to registered email address",
+        )
+    );
+
+})
+
+const verifyOtp = asyncHandler(async (req, res) => {
+    const user = req.user;
+    const { otp } = req.body;
+
+    if (!otp && NaN(Number(otp.trim()))) {
+        throw new ApiError(400, "Otp should be in Number");
+    }
+
+
+
+    const isValidOtp = await validateOtp(user, email, otp);
+
+    if (!isValidOtp) {
+        throw new ApiError("400", "Invalid Otp try again")
+    }
+
+    const response = res.status(200);
+
+    const { accessToken, refreshToken } = res.locals;
+
+    if (refreshToken && accessToken) {
+        response
+            .cookie("refreshToken", refreshToken, {
+                ...cookieOptions,
+                ...refreshTokenExpiry,
+            })
+            .cookie("accessToken", accessToken, {
+                ...cookieOptions,
+                ...accessTokenExpiry,
+            });
+    }
+
+    return response.json(
+        new ApiResponse(200, "Otp is Successfully Verified")
+    )
+
+})
+
+
+const verifyAccount = asyncHandler(async (req, res) => {
+    const user = req.user;
+    const { otp } = req.body;
+
+    if (!otp) {
+        throw new ApiError(400, "Otp is required")
+    }
+
+    const isValidOtp = await validateOtp(user.email, otp);
+
+    if (!isValidOtp) {
+        throw new ApiError(400, "Invalid Otp")
+    }
+
+    user.isVerified = true;
+    await user.save();
+
+    const response = res.status(200);
+
+    const { accessToken, refreshToken } = res.locals;
+
+    if (refreshToken && accessToken) {
+        response
+            .cookie("refreshToken", refreshToken, {
+                ...cookieOptions,
+                ...refreshTokenExpiry,
+            })
+            .cookie("accessToken", accessToken, {
+                ...cookieOptions,
+                ...accessTokenExpiry,
+            });
+    }
+
+    return response.json(
+        new ApiResponse(200, "User Verfied Successfully")
+    )
+
+})
+
+const updateUserEmail = asyncHandler(async (req, res) => {
+    const { otp, newEmail } = req.body;
+    const user = req.user;
+
+    if (!otp || !newEmail) {
+        throw new ApiError(400, "Otp and newEmail field is required")
+    }
+
+    const isVerifiedOtp = await validateOtp(newEmail, otp);
+    if (!isVerifiedOtp) {
+        throw new ApiError(400, "Otp is invalid")
+    }
+
+    user.email = newEmail;
+    await user.save();
+
+
+    const response = res.status(200);
+
+    const { accessToken, refreshToken } = res.locals;
+
+    if (refreshToken && accessToken) {
+        response
+            .cookie("refreshToken", refreshToken, {
+                ...cookieOptions,
+                ...refreshTokenExpiry,
+            })
+            .cookie("accessToken", accessToken, {
+                ...cookieOptions,
+                ...accessTokenExpiry,
+            });
+    }
+
+    return response.json(
+        new ApiResponse(200, "User email updated Successfully")
+    )
+
+})
 
 module.exports = {
     userSignUp,
@@ -428,5 +636,9 @@ module.exports = {
     updateUserPassword,
     updateUserPhoneNumber,
     getCurrentUser,
-    updateUserProfilePic
+    updateUserProfilePic,
+    requestForOtp,
+    updateUserEmail,
+    verifyAccount,
+    verifyOtp
 };
